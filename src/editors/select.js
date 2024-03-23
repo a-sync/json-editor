@@ -3,17 +3,22 @@ import { extend } from '../utilities.js'
 
 export class SelectEditor extends AbstractEditor {
   setValue (value, initial) {
+    console.log('setValue %o', { value, initial, hasPlaceholderOption: this.hasPlaceholderOption })
     /* Sanitize value before setting it */
     let sanitized = this.typecast(value)
     const inEnum = (this.enum_options.length > 0 && this.enum_values.includes(sanitized))
 
     const haveToUseDefaultValue = !!this.jsoneditor.options.use_default_values || typeof this.schema.default !== 'undefined'
+    console.log('%o', { sanitized, inEnum, haveToUseDefaultValue })
 
     if (!this.hasPlaceholderOption && (!inEnum || (initial && !this.isRequired() && !haveToUseDefaultValue))) {
       sanitized = this.enum_values[0]
     }
 
-    if (this.value === sanitized) return
+    if (this.value === sanitized) {
+      console.log('returning %o', { initial, sanitized })
+      return
+    }
 
     const selectedIndex = this.enum_values.indexOf(sanitized)
 
@@ -21,14 +26,18 @@ export class SelectEditor extends AbstractEditor {
       this.input.value = this.enum_options[selectedIndex]
     } else if (this.hasPlaceholderOption) {
       this.input.value = '_placeholder_'
-    } else {
-      this.input.value = sanitized
     }
+    // else {
+    //   this.input.value = sanitized
+    // }
 
     this.value = sanitized
 
     if (!initial) {
       this.is_dirty = true
+    } else {
+      //if has placeholder set ival
+      console.log('initial!')
     }
 
     this.onChange()
